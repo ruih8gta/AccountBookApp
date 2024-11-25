@@ -1,0 +1,143 @@
+{% extends "base.html" %}
+{% block content %}
+<p>貯金管理</p>
+<table class="table">
+    <thead>
+      <tr>
+        <th scope="col">年</th>
+        <th scope="col">月</th>
+        <th scope="col">ゆうちょ銀行</th>
+        <th scope="col">楽天銀行</th>
+        <th scope="col">JRE銀行</th>
+        <th scope="col">銀行合計</th>
+        <th scope="col">証券損益</th>
+        <th scope="col">証券合計</th>
+        <th scope="col">資産合計</th>
+         
+      </tr>
+    </thead>
+    <tbody>
+      {% for saving in savings%}
+      <tr>
+        <td>{{saving.year}}</td>
+        <td>{{saving.month}}</td>
+        <td>{{saving.yucho_asset}}</td>
+        <td>{{saving.rakuten_asset}}</td>
+        <td>{{saving.jre_asset}}</td>
+        <td>{{saving.bank_total}}</td>
+        <td>{{saving.profit_loss}}</td>
+        <td>{{saving.investment_asset}}</td>
+        <td>{{saving.total_money}}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  <p>【貯金データ登録】</p>
+
+<form action="/add_saving" method="post">
+  <div class="row mb-3">
+    <label for="input-item-id" class="col-sm-2 col-form-label">年</label>
+    <div class="col-sm-10">
+      <input
+        type="number"
+        class="form-control"
+        name="input-year"
+      />
+    </div>
+  </div>
+  <div class="row mb-3">
+    <label for="input-item-id" class="col-sm-2 col-form-label">月</label>
+    <div class="col-sm-10">
+      <input
+        type="number"
+        class="form-control"
+        name="input-month"
+      />
+    </div>
+  </div>
+  <div class="row mb-3">
+    <label for="input-item-id" class="col-sm-2 col-form-label">ゆうちょ銀行</label>
+    <div class="col-sm-10">
+      <input
+        type="number"
+        class="form-control"
+        name="input-yucho"
+      />
+    </div>
+  </div>
+  <div class="row mb-3">
+    <label for="input-item-id" class="col-sm-2 col-form-label">楽天銀行</label>
+    <div class="col-sm-10">
+      <input
+        type="number"
+        class="form-control"
+        name="input-rakuten"
+      />
+    </div>
+  </div>
+  <div class="row mb-3">
+    <label for="input-item-id" class="col-sm-2 col-form-label">JRE銀行</label>
+    <div class="col-sm-10">
+      <input
+        type="number"
+        class="form-control"
+        name="input-jre"
+      />
+    </div>
+  </div>
+  <div class="row mb-3">
+    <label for="input-item-id" class="col-sm-2 col-form-label">投資</label>
+    <div class="col-sm-10">
+      <input
+        type="number"
+        class="form-control"
+        name="input-invest"
+      />
+    </div>
+  </div>
+  <div class="row mb-3">
+    <label for="input-item-id" class="col-sm-2 col-form-label">損益</label>
+    <div class="col-sm-10">
+      <input
+        type="number"
+        class="form-control"
+        name="input-loss"
+      />
+    </div>
+  </div>
+
+  <button type="submit" class="btn btn-primary" formmethod="post">
+    登録
+  </button>
+</form>
+
+<p>資産の推移</p>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<canvas id="myChart"></canvas>
+<script>
+    var ctx = document.getElementById('myChart').getContext('2d');
+  
+    var myChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: {{ labels | tojson }},
+            datasets: [{
+          
+      label: 'データ',
+                data: {{ values | tojson }},
+                backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                borderColor: 'rgba(255, 99, 132, 1)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+  
+</script>
+  {% endblock %}

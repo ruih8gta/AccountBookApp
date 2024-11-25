@@ -1,44 +1,59 @@
 from flask import Flask, render_template, request
 from flask_sqlalchemy import SQLAlchemy
+import sqlalchemy
+from models import app,db, SavingsData
+import matplotlib.pyplot as plt
+import random
 
-app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///your_database.db'
-db = SQLAlchemy(app)
-
-# モデル定義 (例として貯金情報を定義)
-class Saving(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    year = db.Column(db.Integer)
-    month = db.Column(db.Integer)
-    yucho = db.Column(db.Integer)
-    rakuten = db.Column(db.Integer)
-    jre = db.Column(db.Integer)
-    investment = db.Column(db.Integer)
-    profit_loss = db.Column(db.Integer)
-
-# ルーティング
+#ページ遷移
 @app.route('/')
-def home():
-    return render_template('home.html')
+def index():
+    data = SavingsData.query.all()
+    latest_money = [account.total_money for account in data][-1]
+    #latest_money = SavingsData.query.order_by(SavingsData.total_money.desc()).first()
 
-@app.route('/saving', methods=['GET', 'POST'])
-def saving():
-    if request.method == 'POST':
-        # 貯金情報の保存処理
-        saving = Saving(
-            year=request.form['year'],
-            month=request.form['month'],
-            yucho=request.form['yucho'],
-            # ...
-        )
-        db.session.add(saving)
+    #labels = ['Red', 'Blue', 'Yellow', 'Green']
+    labels = ['総資産', 'マイホーム代']
+    data = [latest_money,40000000]
+
+    return render_template('index.html', labels=labels, data=data)
+
+@app.route('/savings')
+def savings():
+    savings = SavingsData.query.all()
+    labels, values = get_data()
+    return render_template('savings.html', savings=savings, labels=labels, values=values)
+@app.route('/budget')
+def budget():
+    return render_template('budget.html')
+
+#機能
+@app.route("/add_saving",methods=["POST"])
+def add_saving():
+    year = request.form["input-year"]
+    month = request.form["input-month"]
+    yucho_asset = request.form["input-yucho"]
+    rakuten_asset = request.form["input-rakuten"]
+    jre_asset = request.form["input-jre"]
+    investment_asset = request.form["input-invest"]
+    profit_loss = request.form["input-loss"]
+
+    savings = SavingsData(year,month,yucho_asset,rakuten_asset,jre_asset, investment_asset,profit_loss)
+    try:
+        db.session.add(savings)
         db.session.commit()
-    # 貯金情報の取得処理
-    savings = Saving.query.all()
-    return render_template('savhomeing.html', savings=savings)
+    except sqlalchemy.exc.IntegrityError:
+        return render_template("error.html")
+    savings = SavingsData.query.all()
+    labels, values = get_data()
+    return render_template("savings.html",savings=savings, labels=labels, values=values)
 
-# ... その他のルーティング
+def get_data():
+    data = SavingsData.query.all()
+    labels = [account.id for account in data]
+    values = [account.total_money for account in data]
+    return labels, values
+
 
 if __name__ == '__main__':
-    db.create_all()
     app.run(debug=True)
