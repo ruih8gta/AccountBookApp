@@ -1,38 +1,44 @@
 {% extends "base.html" %}
 {% block content %}
 <p>貯金管理</p>
-<table class="table">
-    <thead>
-      <tr>
-        <th scope="col">年</th>
-        <th scope="col">月</th>
-        <th scope="col">ゆうちょ銀行</th>
-        <th scope="col">楽天銀行</th>
-        <th scope="col">JRE銀行</th>
-        <th scope="col">銀行合計</th>
-        <th scope="col">証券損益</th>
-        <th scope="col">証券合計</th>
-        <th scope="col">資産合計</th>
-         
-      </tr>
-    </thead>
-    <tbody>
-      {% for saving in savings%}
-      <tr>
-        <td>{{saving.year}}</td>
-        <td>{{saving.month}}</td>
-        <td>{{saving.yucho_asset}}</td>
-        <td>{{saving.rakuten_asset}}</td>
-        <td>{{saving.jre_asset}}</td>
-        <td>{{saving.bank_total}}</td>
-        <td>{{saving.profit_loss}}</td>
-        <td>{{saving.investment_asset}}</td>
-        <td>{{saving.total_money}}</td>
-      </tr>
-      {% endfor %}
-    </tbody>
-  </table>
-  <p>【貯金データ登録】</p>
+<style>
+  .scrollable-table {
+      overflow-x: auto;
+      height: 500px;
+      width: 100%; /* テーブルの幅を調整 */
+  }
+</style>
+
+<p>【資産の推移】</p>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<canvas id="myChart"></canvas>
+<script>
+    var ctx = document.getElementById('myChart').getContext('2d');
+  
+    var myChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: {{ labels | tojson }},
+            datasets: [{
+          
+      label: 'データ',
+                data: {{ values | tojson }},
+                backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                borderColor: 'rgba(255, 99, 132, 1)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+  
+</script>
+<p>【貯金データ登録】</p>
 
 <form action="/add_saving" method="post">
   <div class="row mb-3">
@@ -111,33 +117,44 @@
   </button>
 </form>
 
-<p>資産の推移</p>
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<canvas id="myChart"></canvas>
-<script>
-    var ctx = document.getElementById('myChart').getContext('2d');
-  
-    var myChart = new Chart(ctx, {
-        type: 'line',
-        data: {
-            labels: {{ labels | tojson }},
-            datasets: [{
-          
-      label: 'データ',
-                data: {{ values | tojson }},
-                backgroundColor: 'rgba(255, 99, 132, 0.2)',
-                borderColor: 'rgba(255, 99, 132, 1)',
-                borderWidth: 1
-            }]
-        },
-        options: {
-            scales: {
-                y: {
-                    beginAtZero: true
-                }
-            }
-        }
-    });
-  
-</script>
+<p>【資産の推移（表）】</p>
+<div class="scrollable-table">
+  <table class="table">
+      <thead>
+        <tr>
+          <th scope="col">年</th>
+          <th scope="col">月</th>
+          <th scope="col">ゆうちょ銀行</th>
+          <th scope="col">楽天銀行</th>
+          <th scope="col">JRE銀行</th>
+          <th scope="col">銀行合計</th>
+          <th scope="col">証券損益</th>
+          <th scope="col">証券合計</th>
+          <th scope="col">資産合計</th>
+          <th scope="col">操作</th>
+           
+        </tr>
+      </thead>
+      <tbody>
+        {% for saving in savings%}
+        <tr>
+          <td>{{saving.year}}</td>
+          <td>{{saving.month}}</td>
+          <td>{{saving.yucho_asset}}</td>
+          <td>{{saving.rakuten_asset}}</td>
+          <td>{{saving.jre_asset}}</td>
+          <td>{{saving.bank_total}}</td>
+          <td>{{saving.profit_loss}}</td>
+          <td>{{saving.investment_asset}}</td>
+          <td>{{saving.total_money|format_money}}</td>
+          <td>
+            <a href="edit/{{ saving.id }}" class="btn btn-sm btn-warning">編集</a>
+            <a href="delete/{{ saving.id }}" class="btn btn-sm btn-danger">削除</a>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    </div>
+  
   {% endblock %}
