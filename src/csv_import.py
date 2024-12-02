@@ -33,8 +33,8 @@ def csv_to_sqlite(csv_file, table_name, db_file):
     conn.close()
 
 # 使用例
-csv_file = 'savings_data.csv'
-table_name = 'savings_data'
+csv_file = 'accountbook_data.csv'
+table_name = 'accountbook_data'
 db_file = 'account.db'
 
 csv_to_sqlite(csv_file, table_name, db_file)

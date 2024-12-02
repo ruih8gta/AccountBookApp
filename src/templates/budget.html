@@ -1,4 +1,212 @@
 {% extends "base.html" %}
 {% block content %}
 <p>家計簿</p>
+<style>
+  .scrollable-table {
+      overflow-x: auto;
+      height: 500px;
+      width: 100%; /* テーブルの幅を調整 */
+  }
+</style>
+
+<p>【支出の推移】</p>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<canvas id="myChart"></canvas>
+<script>
+  /**棒グラフの表示*/
+  var ctx = document.getElementById('myChart').getContext('2d');
+  var myChart = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: {{ labels | tojson }},
+      datasets: [
+        {
+          label: '支出',
+          data: {{ values.out_total | tojson }},
+          backgroundColor: 'rgba(255, 99, 132, 0.2)',
+          borderColor: 'rgba(255, 99, 132, 1)',
+          borderWidth: 1,
+          stack: 'Stack 0'
+        },
+        {
+          label: '貯蓄',
+          data: {{ values.save_total | tojson }},
+          backgroundColor: 'rgba(54, 162, 235, 0.2)',
+          borderColor: 'rgba(54, 162, 235, 1)',
+          borderWidth: 1,
+          stack: 'Stack 0'
+        },
+        {
+          label: '収入',
+          data: {{ values.in_total | tojson }},
+          backgroundColor: 'rgba(75, 192, 192, 0.2)',
+          borderColor: 'rgba(75, 192, 192, 1)',
+          borderWidth: 1,
+          stack: 'Stack 1'
+        }
+      ]
+    },
+    options: {
+      scales: {
+        y: {
+          beginAtZero: true,
+          stacked: true
+        },
+        x: {
+          stacked: true
+        }
+      }
+    }
+  });
+</script>
+
+<div class="scrollable-table">
+  <table class="table">
+    <thead style="position: sticky; top: 0;">
+      <tr>
+        <th scope="col">年</th>
+        <th scope="col">月</th>
+        <th scope="col">食費</th>
+        <th scope="col">外食</th>
+        <th scope="col">生活用品</th>
+        <th scope="col">家賃</th>
+        <th scope="col">電気</th>
+        <th scope="col">ガス</th>
+        <th scope="col">水道</th>
+        <th scope="col">ネット</th>
+        <th scope="col">その他</th>
+        <th scope="col">赤ちゃん</th>
+        <th scope="col">支出合計</th>
+        <th scope="col">収入合計</th>
+        <th scope="col">貯金</th>
+        <th scope="col">差額</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for account in accountbooks %}
+      <tr>
+        <td>{{ account.year }}</td>
+        <td>{{ account.month }}</td>
+        <td>{{ account.syokuhi }}</td>
+        <td>{{ account.gaisyoku }}</td>
+        <td>{{ account.seikatsu }}</td>
+        <td>{{ account.yachin }}</td>
+        <td>{{ account.denki }}</td>
+        <td>{{ account.gas }}</td>
+        <td>{{ account.suido }}</td>
+        <td>{{ account.net }}</td>
+        <td>{{ account.other }}</td>
+        <td>{{ account.baby }}</td>
+        <td>{{ account.out_total }}</td>
+        <td>{{ account.in_total }}</td>
+        <td>{{ account.save_total }}</td>
+        <td>{{ account.diff }}</td>
+        <td>
+          <a href="edit/{{ account.id }}" class="btn btn-sm btn-warning">編集</a>
+          <a href="delete/{{ account.id }}" class="btn btn-sm btn-danger">削除</a>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+<p>【家計簿データ登録】</p>
+
+<form action="/add_account" method="post">
+  <div class="row mb-3">
+    <label for="input-item-id" class="col-sm-2 col-form-label">年</label>
+    <div class="col-sm-10">
+      <input
+        type="number"
+        class="form-control"
+        name="input-year"
+      />
+    </div>
+  </div>
+  <div class="row mb-3">
+    <label for="input-item-id" class="col-sm-2 col-form-label">月</label>
+    <div class="col-sm-10">
+      <input
+        type="number"
+        class="form-control"
+        name="input-month"
+      />
+    </div>
+  </div>
+  <div class="row mb-3">
+    <label for="input-syokuhi" class="col-sm-2 col-form-label">食費</label>
+    <div class="col-sm-10">
+      <input type="number" class="form-control" name="input-syokuhi" />
+    </div>
+  </div>
+  <div class="row mb-3">
+    <label for="input-gaisyoku" class="col-sm-2 col-form-label">外食</label>
+    <div class="col-sm-10">
+      <input type="number" class="form-control" name="input-gaisyoku" />
+    </div>
+  </div>
+  <div class="row mb-3">
+    <label for="input-seikatsu" class="col-sm-2 col-form-label">生活用品</label>
+    <div class="col-sm-10">
+      <input type="number" class="form-control" name="input-seikatsu" />
+    </div>
+  </div>
+  <div class="row mb-3">
+    <label for="input-yachin" class="col-sm-2 col-form-label">家賃</label>
+    <div class="col-sm-10">
+      <input type="number" class="form-control" name="input-yachin" />
+    </div>
+  </div>
+  <div class="row mb-3">
+    <label for="input-denki" class="col-sm-2 col-form-label">電気</label>
+    <div class="col-sm-10">
+      <input type="number" class="form-control" name="input-denki" />
+    </div>
+  </div>
+  <div class="row mb-3">
+    <label for="input-gas" class="col-sm-2 col-form-label">ガス</label>
+    <div class="col-sm-10">
+      <input type="number" class="form-control" name="input-gas" />
+    </div>
+  </div>
+  <div class="row mb-3">
+    <label for="input-suido" class="col-sm-2 col-form-label">水道</label>
+    <div class="col-sm-10">
+      <input type="number" class="form-control" name="input-suido" />
+    </div>
+  </div>
+  <div class="row mb-3">
+    <label for="input-net" class="col-sm-2 col-form-label">ネット</label>
+    <div class="col-sm-10">
+      <input type="number" class="form-control" name="input-net" />
+    </div>
+  </div>
+  <div class="row mb-3">
+    <label for="input-baby" class="col-sm-2 col-form-label">赤ちゃん</label>
+    <div class="col-sm-10">
+      <input type="number" class="form-control" name="input-baby" />
+    </div>
+  </div>
+  <div class="row mb-3">
+    <label for="input-other" class="col-sm-2 col-form-label">その他</label>
+    <div class="col-sm-10">
+      <input type="number" class="form-control" name="input-other" />
+    </div>
+  </div>
+  <div class="row mb-3">
+    <label for="input-save" class="col-sm-2 col-form-label">貯金</label>
+    <div class="col-sm-10">
+      <input type="number" class="form-control" name="input-save" />
+    </div>
+  </div>
+  <div class="row mb-3">
+    <label for="input-in" class="col-sm-2 col-form-label">収入合計</label>
+    <div class="col-sm-10">
+      <input type="number" class="form-control" name="input-in" />
+    </div>
+  </div>
+  <button type="submit" class="btn btn-primary">登録</button>
+</form>
+
 {% endblock %}

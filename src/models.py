@@ -38,5 +38,45 @@ class SavingsData(db.Model):
     def __repr__(self):
         return f'<SavingsData {self.id}>'
 
+class AccountBookData(db.Model):
+    __tablename__ = 'accountbook_data'
+    id = db.Column(db.Integer, primary_key=True)
+    year = db.Column(db.Integer)
+    month = db.Column(db.Integer)
+    syokuhi = db.Column(db.Integer)
+    gaisyoku = db.Column(db.Integer)
+    seikatsu = db.Column(db.Integer)
+    yachin = db.Column(db.Integer)
+    denki = db.Column(db.Integer)
+    gas = db.Column(db.Integer)
+    suido = db.Column(db.Integer)
+    net = db.Column(db.Integer)
+    baby = db.Column(db.Integer)
+    other = db.Column(db.Integer)
+    out_total = db.Column(db.Integer)
+    save_total = db.Column(db.Integer)
+    in_total = db.Column(db.Integer)
+    diff = db.Column(db.Integer)
+    def __init__(self,year,month,syokuhi,gaisyoku,seikatsu,yachin,denki,gas,suido,net,baby,other,save_total,in_total):
+            self.year = year
+            self.month = month
+            self.syokuhi = syokuhi
+            self.gaisyoku = gaisyoku
+            self.seikatsu = seikatsu
+            self.yachin = yachin
+            self.denki = denki
+            self.gas = gas
+            self.suido = suido
+            self.net = net
+            self.baby =baby
+            self.other = other
+            self.out_total = int(self.syokuhi) + int(self.gaisyoku) + int(self.seikatsu) + \
+             int(self.yachin) + int(self.denki) + int(self.gas) + int(self.suido) + int(self.net) + int(self.baby) + int(self.other)
+            self.save_total = save_total
+            self.in_total = in_total
+            self.diff = int(self.in_total) - int(self.save_total) - int(self.out_total)
+    def __repr__(self):
+        return f'<AccountBookData {self.id}>'
+
 with app.app_context():
     db.create_all()

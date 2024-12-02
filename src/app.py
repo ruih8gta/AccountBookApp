@@ -1,7 +1,7 @@
 from flask import Flask, render_template, request
 from flask_sqlalchemy import SQLAlchemy
 import sqlalchemy
-from models import app,db, SavingsData
+from models import app,db, SavingsData, AccountBookData
 import matplotlib.pyplot as plt
 import random
 
@@ -25,9 +25,11 @@ def savings():
     return render_template('savings.html', savings=savings, labels=labels, values=values)
 @app.route('/budget')
 def budget():
-    return render_template('budget.html')
+    accountbooks = AccountBookData.query.all()
+    labels, values = get_data_account()
+    return render_template('budget.html', accountbooks=accountbooks, labels=labels, values=values)
 
-#機能
+#予算管理機能
 @app.route("/add_saving",methods=["POST"])
 def add_saving():
     year = request.form["input-year"]
@@ -54,6 +56,58 @@ def get_data():
     values = [account.total_money for account in data]
     return labels, values
 
+#家計簿機能
+@app.route("/add_account",methods=["POST"])
+def add_account():
+    year = request.form["input-year"]
+    month = request.form["input-month"]
+    syokuhi = request.form["input-syokuhi"]
+    gaisyoku = request.form["input-gaisyoku"]
+    seikatsu = request.form["input-seikatsu"]
+    yachin = request.form["input-yachin"]
+    denki = request.form["input-denki"]
+    gas = request.form["input-gas"]
+    suido = request.form["input-suido"]
+    net = request.form["input-net"]
+    baby = request.form["input-baby"]
+    other = request.form["input-other"]
+    save_total = request.form["input-save"]
+    in_total = request.form["input-in"]
 
+    accountbook = AccountBookData(year,month,syokuhi,gaisyoku,seikatsu,yachin,denki,gas,suido,net,baby,other,save_total,in_total)
+    try:
+        db.session.add(accountbook)
+        db.session.commit()
+    except sqlalchemy.exc.IntegrityError:
+        return render_template("error.html")
+    accountbooks = AccountBookData.query.all()
+    return render_template("budget.html",accountbooks=accountbooks, labels=labels, values=values)
+#直近12ヶ月のデータを取得し、棒グラフで表示するためのデータを取得
+def get_data_account():
+    data = AccountBookData.query.all()
+    #直近１２件のデータを取得
+    data = data[-12:]
+    labels = [account.id for account in data]
+    #    out_total　と　save_total　と in_totalの値を取得
+    values1 = [account.out_total for account in data] 
+    values2 = [account.save_total for account in data]
+    values3 = [account.in_total for account in data]
+    values = {
+    "out_total": values1 if values1 is not None else [],
+    "save_total": values2 if values2 is not None else [],
+    "in_total": values3 if values3 is not None else []
+    }
+    """
+    syokuhi
+    gaisyoku 
+    seikatsu 
+    yachin 
+    denki
+    gas 
+    suido 
+    net 
+    baby 
+    other"""
+    return labels, values
 if __name__ == '__main__':
     app.run(debug=True)

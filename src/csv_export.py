@@ -35,7 +35,7 @@ def sqlite_to_csv(db_file, table_name, csv_file):
 
 # 使用例
 db_file = 'account.db'
-table_name = 'savings_data'
-csv_file = 'savings_data.csv'
+table_name = 'accountbook_data'
+csv_file = 'accountbook_data.csv'
 
 sqlite_to_csv(db_file, table_name, csv_file)
