@@ -1,11 +1,9 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
-from jinja2 import Environment
 import os
 
 # create the app
 app = Flask(__name__)
-app.jinja_env.filters['format_money'] = lambda value: f"{value:,}円"
 base_dir = os.path.dirname(__file__)
 # configure the SQLite database, relative to the app instance folder
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///"+os.path.join(base_dir,"account.db")

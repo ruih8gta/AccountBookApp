@@ -7,6 +7,20 @@
       height: 500px;
       width: 100%; /* テーブルの幅を調整 */
   }
+  table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+  th, td {
+      padding: 1px 1px;
+      border: 1px solid #ddd;
+  }
+  thead th {
+        position: sticky;
+        top: 0;
+        background-color: #ddd; /* Adjust the background color as needed */
+        z-index: 1;
+    }
 </style>
 
 <p>【支出の推移】</p>
@@ -61,8 +75,8 @@
 </script>
 
 <div class="scrollable-table">
-  <table class="table">
-    <thead style="position: sticky; top: 0;">
+  <table class="table-container">
+    <thead>
       <tr>
         <th scope="col">年</th>
         <th scope="col">月</th>
@@ -80,6 +94,7 @@
         <th scope="col">収入合計</th>
         <th scope="col">貯金</th>
         <th scope="col">差額</th>
+        <th scope="col">操作</th>
       </tr>
     </thead>
     <tbody>
@@ -87,20 +102,20 @@
       <tr>
         <td>{{ account.year }}</td>
         <td>{{ account.month }}</td>
-        <td>{{ account.syokuhi }}</td>
-        <td>{{ account.gaisyoku }}</td>
-        <td>{{ account.seikatsu }}</td>
-        <td>{{ account.yachin }}</td>
-        <td>{{ account.denki }}</td>
-        <td>{{ account.gas }}</td>
-        <td>{{ account.suido }}</td>
-        <td>{{ account.net }}</td>
-        <td>{{ account.other }}</td>
-        <td>{{ account.baby }}</td>
-        <td>{{ account.out_total }}</td>
-        <td>{{ account.in_total }}</td>
-        <td>{{ account.save_total }}</td>
-        <td>{{ account.diff }}</td>
+        <td class="saving_money">{{ account.syokuhi }}</td>
+        <td class="saving_money">{{ account.gaisyoku }}</td>
+        <td class="saving_money" >{{ account.seikatsu }}</td>
+        <td class="saving_money">{{ account.yachin }}</td>
+        <td class="saving_money">{{ account.denki }}</td>
+        <td class="saving_money">{{ account.gas }}</td>
+        <td class="saving_money">{{ account.suido }}</td>
+        <td class="saving_money">{{ account.net }}</td>
+        <td class="saving_money">{{ account.other }}</td>
+        <td class="saving_money">{{ account.baby }}</td>
+        <td class="saving_money">{{ account.out_total }}</td>
+        <td class="saving_money">{{ account.in_total }}</td>
+        <td class="saving_money">{{ account.save_total }}</td>
+        <td class="saving_money">{{ account.diff }}</td>
         <td>
           <a href="edit/{{ account.id }}" class="btn btn-sm btn-warning">編集</a>
           <a href="delete/{{ account.id }}" class="btn btn-sm btn-danger">削除</a>
@@ -110,6 +125,17 @@
     </tbody>
   </table>
 </div>
+<script>
+  function format_yen(amount) {
+      return '¥' + parseFloat(amount).toLocaleString('ja-JP');
+  }
+  
+  // すべてのsaving_moneyクラスの要素に対してフォーマットを適用
+  document.querySelectorAll('.saving_money').forEach(function(element) {
+      element.innerText = format_yen(element.innerText);
+  });
+  </script>
+  
 
 <p>【家計簿データ登録】</p>
 
