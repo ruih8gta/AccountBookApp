@@ -1,12 +1,38 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, redirect, url_for, session
 from flask_sqlalchemy import SQLAlchemy
 import sqlalchemy
-from models import app,db, SavingsData, AccountBookData
+from models import app, db, SavingsData, AccountBookData, User
 import matplotlib.pyplot as plt
 import random
+from functools import wraps
+
+def login_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if 'user_id' not in session:
+            return redirect(url_for('login'))
+        return f(*args, **kwargs)
+    return decorated_function
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        password = request.form['password']
+        user = User.query.filter_by(password=password).first()
+        if user:
+            session['user_id'] = user.id
+            return redirect(url_for('index'))
+        return render_template('login.html', error='Invalid password')
+    return render_template('login.html')
+
+@app.route('/logout')
+def logout():
+    session.pop('user_id', None)
+    return redirect(url_for('login'))
 
 #ページ遷移
 @app.route('/')
+@login_required
 def index():
     data = SavingsData.query.all()
     latest_money = [account.total_money for account in data][-1]
@@ -19,11 +45,14 @@ def index():
     return render_template('index.html', labels=labels, data=data)
 
 @app.route('/savings')
+@login_required
 def savings():
     savings = SavingsData.query.all()
     labels, values = get_data()
     return render_template('savings.html', savings=savings, labels=labels, values=values)
+
 @app.route('/budget')
+@login_required
 def budget():
     accountbooks = AccountBookData.query.all()
     labels, values = get_data_account()
@@ -31,6 +60,7 @@ def budget():
 
 #予算管理機能
 @app.route("/add_saving",methods=["POST"])
+@login_required
 def add_saving():
     year = request.form["input-year"]
     month = request.form["input-month"]
@@ -58,6 +88,7 @@ def get_data():
 
 #家計簿機能
 @app.route("/add_account",methods=["POST"])
+@login_required
 def add_account():
     year = request.form["input-year"]
     month = request.form["input-month"]
@@ -82,6 +113,7 @@ def add_account():
         return render_template("error.html")
     accountbooks = AccountBookData.query.all()
     return render_template("budget.html",accountbooks=accountbooks, labels=labels, values=values)
+
 #直近12ヶ月のデータを取得し、棒グラフで表示するためのデータを取得
 def get_data_account():
     data = AccountBookData.query.all()
@@ -109,5 +141,7 @@ def get_data_account():
     baby 
     other"""
     return labels, values
+
 if __name__ == '__main__':
+    app.secret_key = 'your_secret_key'
     app.run(debug=True)

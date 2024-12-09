@@ -76,5 +76,16 @@ class AccountBookData(db.Model):
     def __repr__(self):
         return f'<AccountBookData {self.id}>'
 
+class User(db.Model):
+    __tablename__ = 'user'
+    id = db.Column(db.Integer, primary_key=True)
+    password = db.Column(db.String(128), nullable=False)
+
+    def __init__(self, password):
+        self.password = password
+
+    def __repr__(self):
+        return f'<User {self.id}>'
+
 with app.app_context():
     db.create_all()
