@@ -2,3 +2,5 @@ venv/
 __pycache__/
 instance/
 prompt.txt
+src/account.db
+src/csv/
