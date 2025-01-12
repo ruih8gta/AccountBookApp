@@ -5,7 +5,7 @@ from models import app, db, SavingsData, AccountBookData, User
 import matplotlib.pyplot as plt
 import random
 from functools import wraps
-
+app.secret_key = 'your_secret_key'
 def login_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
@@ -143,5 +143,4 @@ def get_data_account():
     return labels, values
 
 if __name__ == '__main__':
-    app.secret_key = 'your_secret_key'
     app.run(debug=True)
