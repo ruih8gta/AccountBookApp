@@ -112,6 +112,7 @@ def add_account():
     except sqlalchemy.exc.IntegrityError:
         return render_template("error.html")
     accountbooks = AccountBookData.query.all()
+    labels, values = get_data_account()
     return render_template("budget.html",accountbooks=accountbooks, labels=labels, values=values)
 
 #直近12ヶ月のデータを取得し、棒グラフで表示するためのデータを取得
