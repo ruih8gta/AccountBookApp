@@ -87,5 +87,20 @@ class User(db.Model):
     def __repr__(self):
         return f'<User {self.id}>'
 
+class SavingsData2(db.Model):
+    __tablename__ = 'savings_data2'
+    id = db.Column(db.Integer, primary_key=True)
+    year = db.Column(db.Integer)
+    month = db.Column(db.Integer)
+    bank_1 = db.Column(db.Integer)
+    #bank_2 = db.Column(db.Integer)
+    def __init__(self,year,month,bank_1):
+            self.year = year
+            self.month = month
+            self.bank_1 = bank_1
+            #self.bank_2 = bank_2
+    def __repr__(self):
+        return f'<SavingsData2 {self.id}>'
+
 with app.app_context():
     db.create_all()

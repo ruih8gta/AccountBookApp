@@ -1,7 +1,7 @@
 from flask import Flask, render_template, request, redirect, url_for, session
 from flask_sqlalchemy import SQLAlchemy
 import sqlalchemy
-from models import app, db, SavingsData, AccountBookData, User
+from models import app, db, SavingsData,SavingsData2, AccountBookData, User
 import matplotlib.pyplot as plt
 import random
 from functools import wraps
@@ -51,6 +51,14 @@ def savings():
     labels, values = get_data()
     return render_template('savings.html', savings=savings, labels=labels, values=values)
 
+@app.route('/savings2')
+@login_required
+def savings2():
+    savings2 = SavingsData2.query.all()
+    labels, values = get_data2()
+    return render_template('savings2.html', savings2=savings2, labels=labels, values=values)
+
+
 @app.route('/budget')
 @login_required
 def budget():
@@ -85,6 +93,29 @@ def get_data():
     labels = [account.id for account in data]
     values = [account.total_money for account in data]
     return labels, values
+
+#予算管理機能2
+@app.route("/add_saving2",methods=["POST"])
+@login_required
+def add_saving2():
+    year2 = request.form["input-year2"]
+    month2 = request.form["input-month2"]
+    bank_1 = request.form["input-bank1"]
+    savings2 = SavingsData2(year2,month2,bank_1)
+    try:
+        db.session.add(savings2)
+        db.session.commit()
+    except sqlalchemy.exc.IntegrityError:
+        return render_template("error.html")
+    savings2 = SavingsData2.query.all()
+    labels, values = get_data2()
+    return render_template("savings2.html",savings2=savings2, labels=labels, values=values)
+def get_data2():
+    data = SavingsData2.query.all()
+    labels = [account.id for account in data]
+    values = [account.bank_1 for account in data]
+    return labels, values
+
 
 #家計簿機能
 @app.route("/add_account",methods=["POST"])
