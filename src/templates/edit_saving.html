@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>データ編集</h2>
+<form method="post">
+  <div>年: <input type="number" name="year" value="{{ saving.year }}"></div>
+  <div>月: <input type="number" name="month" value="{{ saving.month }}"></div>
+  <div>ゆうちょ銀行: <input type="number" name="yucho_asset" value="{{ saving.yucho_asset }}"></div>
+  <div>楽天銀行: <input type="number" name="rakuten_asset" value="{{ saving.rakuten_asset }}"></div>
+  <div>JRE銀行: <input type="number" name="jre_asset" value="{{ saving.jre_asset }}"></div>
+  <div>銀行合計: <input type="number" name="bank_total" value="{{ saving.bank_total }}"></div>
+  <div>証券損益: <input type="number" name="profit_loss" value="{{ saving.profit_loss }}"></div>
+  <div>証券合計: <input type="number" name="investment_asset" value="{{ saving.investment_asset }}"></div>
+  <div>資産合計: <input type="number" name="total_money" value="{{ saving.total_money }}"></div>
+  <button type="submit" class="btn btn-primary">保存</button>
+</form>
+{% endblock %}

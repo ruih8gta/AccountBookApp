@@ -146,6 +146,23 @@ def add_account():
     labels, values = get_data_account()
     return render_template("budget.html",accountbooks=accountbooks, labels=labels, values=values)
 
+@app.route('/edit/<int:id>', methods=['GET', 'POST'])
+def edit_saving(id):
+    saving = SavingsData.query.get(id)
+    if request.method == 'POST':
+        saving.year = request.form['year']
+        saving.month = request.form['month']
+        saving.yucho_asset = request.form['yucho_asset']
+        saving.rakuten_asset = request.form['rakuten_asset']
+        saving.jre_asset = request.form['jre_asset']
+        saving.bank_total = request.form['bank_total']
+        saving.profit_loss = request.form['profit_loss']
+        saving.investment_asset = request.form['investment_asset']
+        saving.total_money = request.form['total_money']
+        db.session.commit()
+        return redirect(url_for('savings'))  # 一覧ページにリダイレクト
+    return render_template('edit_saving.html', saving=saving)
+
 #直近12ヶ月のデータを取得し、棒グラフで表示するためのデータを取得
 def get_data_account():
     data = AccountBookData.query.all()
